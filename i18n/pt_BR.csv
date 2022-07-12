@@ -1,0 +1,37 @@
+"Receive the Full Amount","Receberá todo o valor"
+"Retain Full Value","Não recebe o valor"
+"Any Sub Seller","Qualquer Sub Seller"
+"Sub Seller","Sub Seller"
+"Percentage he receives","Percentual que receberá"
+"Receiving Freight","Recebimento do Frete"
+"Receiving Interest","Recebimento do Juros"
+Add,Adicionar
+"Error: %1, description: %2","Erro: %1, descrição: %2"
+Shipping,Envio
+Invoice,Fatura
+"Not Applicable","Não aplicável"
+"Cron and Manual Release","Cron e liberação manual"
+"Manual Release","Liberação Manual"
+"Product Name: %1 | Qty: %2","Nome: %1 | Qtd: %2"
+shipping-order-%1,shipping-order-%1
+"Shipping for %1 products","Valor de frete para %1 produtos"
+interest-to-total-%1,interest-to-total-%1
+"Interest for %1 installment in %2 total","Juros para %1 parcela do valor %2 total"
+"Are you sure you want to do this?","Tem certeza que deseja fazer isso??"
+"Payment Release","Liberar Pagamento"
+"Getnet Split","Getnet Split"
+Orders,Pedidos
+Actions,Ação
+"Marketplace - Payment Release","Marketplace - Payment Release"
+"Set Split's","Definição de Split"
+"<div class='getnet-payment-logo'></div><div class='getnet-payment-byline'><p><b>Pagamentos Digitais Getnet</b> - Split Payment</p><p>Com os Pagamentos Digitais Getnet, você tem acesso a soluções completas para oferecer a melhor experiência de pagamento online. Além disso, você pode contar com uma tecnologia de ponta e segurança em todas as transações.</p></div>","<div class='getnet-payment-logo'></div><div class='getnet-payment-byline'><p><b>Pagamentos Digitais Getnet</b> - Split Payment</p><p>Com os Pagamentos Digitais Getnet, você tem acesso a soluções completas para oferecer a melhor experiência de pagamento online. Além disso, você pode contar com uma tecnologia de ponta e segurança em todas as transações.</p></div>"
+"Technical support available <a href=""https://github.com/getnet-adquirencia/payment-magento/issues/new/choose"">here</a>.","Suporte técnico <a href=""https://github.com/getnet-adquirencia/payment-magento/issues/new/choose"">aqui</a>."
+"Sets split commissions","Definir Comissão"
+Commisions,Comissões
+"Addtional Data of Boleto","Informação adicional para o Boleto"
+"Guarantor Name","Nome do Avalista"
+"Guarantor Document Number","Documento fiscal do Avalista"
+"Release Type","Tipo de liberação"
+"Cron by","Tipo de execução do cron"
+"Release Days","Dias de liberação"
+"Getnet Sub Seller","Getnet Sub Seller"

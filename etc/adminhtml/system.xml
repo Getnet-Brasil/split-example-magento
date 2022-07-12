@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Getnet. All rights reserved.
+ *
+ * @author    Bruno Elisei <brunoelisei@o2ti.com>
+ * See LICENSE for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="getnet" sortOrder="120">
+            <label>Getnet</label>
+        </tab>
+        <section id="getnet_split" translate="label" sortOrder="1600" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Set Split's</label>
+            <tab>getnet</tab>
+            <resource>Getnet_SplitExampleMagento::config_split</resource>
+            <group id="general" translate="label comment" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <label><![CDATA[<div class='getnet-payment-logo'></div><div class='getnet-payment-byline'><p><b>Pagamentos Digitais Getnet</b> - Split Payment</p><p>Com os Pagamentos Digitais Getnet, você tem acesso a soluções completas para oferecer a melhor experiência de pagamento online. Além disso, você pode contar com uma tecnologia de ponta e segurança em todas as transações.</p></div>]]></label>
+                <fieldset_css>complex getnet-payment-section</fieldset_css>
+                <frontend_model>Getnet\PaymentMagento\Model\Adminhtml\Source\PaymentGroup</frontend_model>
+                <comment><![CDATA[Technical support available <a href="https://github.com/getnet-adquirencia/payment-magento/issues/new/choose">here</a>.]]></comment>
+                <group id="split_commisions" translate="label comment" type="text" sortOrder="300" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Sets split commissions</label>
+                    <field id="commisions" translate="label comment" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                        <label>Commisions</label>
+                        <frontend_model>Getnet\SplitExampleMagento\Block\Adminhtml\System\Form\Field\SplitCommision</frontend_model>
+                        <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                    </field>
+                </group>
+                <group id="addtional_boleto" translate="label comment" type="text" sortOrder="300" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Addtional Data of Boleto</label>
+                     <field id="guarantor_name" translate="label comment" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Guarantor Name</label>
+                    </field>
+                    <field id="guarantor_document" translate="label comment" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Guarantor Document Number</label>
+                    </field>
+                </group>
+                <group id="payment_release" translate="label comment" sortOrder="300" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Payment Release</label>
+                    <field id="type_release" translate="label comment" type="select" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Release Type</label>
+                        <source_model>Getnet\SplitExampleMagento\Model\Source\ReleaseType</source_model>
+                    </field>
+                    <field id="cron_by" translate="label comment" type="select" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Cron by</label>
+                        <source_model>Getnet\SplitExampleMagento\Model\Source\CronBy</source_model>
+                        <depends>
+                            <field id="*/*/*/type_release">cron</field>
+                        </depends>
+                    </field>
+                    <field id="release_day" translate="label comment" sortOrder="220" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Release Days</label>
+                        <depends>
+                            <field id="*/*/*/type_release">cron</field>
+                        </depends>
+                    </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

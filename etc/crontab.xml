@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Getnet. All rights reserved.
+ *
+ * @author    Bruno Elisei <brunoelisei@o2ti.com>
+ * See LICENSE for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="getnet_paymentmagento_base">
+        <job name="payment_release_by_invoice" instance="Getnet\SplitExampleMagento\Cron\ReleaseByInvoice" method="execute">
+            <schedule>59 23 * * *</schedule>
+        </job>
+        <job name="payment_release_by_ship" instance="Getnet\SplitExampleMagento\Cron\ReleaseByShip" method="execute">
+            <schedule>59 23 * * *</schedule>
+        </job>
+    </group>
+</config>

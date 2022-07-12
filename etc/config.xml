@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Getnet. All rights reserved.
+ *
+ * @author    Bruno Elisei <brunoelisei@o2ti.com>
+ * See LICENSE for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <getnet_split>
+            <general>
+                <split_commisions>
+                    <commisions>
+                        <field0>
+                            <sub_seller_id>any</sub_seller_id>
+                            <commission_percentage>80</commission_percentage>
+                            <include_freight>full</include_freight>
+                            <include_interest>full</include_interest>
+                        </field0>
+                    </commisions>
+                </split_commisions>
+            </general>
+        </getnet_split>
+    </default>
+</config>

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Getnet. All rights reserved.
+ *
+ * @author    Bruno Elisei <brunoelisei@o2ti.com>
+ * See LICENSE for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Getnet_SubSellerMagento::manage_split" title="Set Split's" translate="title" module="Getnet_SplitExampleMagento" sortOrder="30" parent="Getnet_SubSellerMagento::subseller" action="adminhtml/system_config/edit/section/getnet_split/" resource="Getnet_SubSellerMagento::manage_subseller"/>
+    </menu>
+</config>
