@@ -12,17 +12,34 @@
         <plugin name="sub_seller_id" 
             type="Getnet\SplitExampleMagento\Plugin\Magento\Quote\Model\Quote\Item\SubSellerIdToOrderItem" />
     </type>
-    <type name="Getnet\PaymentMagento\Gateway\Request\SplitPaymentDataRequest">
-        <plugin name="sub_seller_id" 
-            type="Getnet\SplitExampleMagento\Plugin\Getnet\PaymentMagento\Gateway\Request\FetchSubSellerIdToSplitPayment" />
-    </type>
-    <type name="Getnet\PaymentMagento\Gateway\Request\BoletoPaymentDataRequest">
-        <plugin name="sub_seller_addtional_data"
-            type="Getnet\SplitExampleMagento\Plugin\Getnet\PaymentMagento\Gateway\Request\AddtionalDataBoletoPaymentDataRequest" />
-    </type>
+
+    <virtualType name="PaymentMagentoBoletoOrderRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="splitPayment" xsi:type="string">Getnet\SplitExampleMagento\Gateway\Request\Boleto\SplitPaymentDataRequest</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="PaymentMagentoCcAuthorizationRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="splitPayment" xsi:type="string">Getnet\SplitExampleMagento\Gateway\Request\Card\SplitPaymentDataRequest</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="PaymentMagentoCcVaultRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="splitPayment" xsi:type="string">Getnet\SplitExampleMagento\Gateway\Request\Card\SplitPaymentDataRequest</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!--
     <type name="Getnet\PaymentMagento\Gateway\Request\RefundRequest">
         <plugin name="sub_seller_addtional_data"
             type="Getnet\SplitExampleMagento\Plugin\Getnet\PaymentMagento\Gateway\Request\AddtionalDataRefundRequest" />
-    </type>
-    
+    </type> -->
 </config>

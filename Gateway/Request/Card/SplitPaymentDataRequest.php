@@ -6,22 +6,38 @@
  * See LICENSE for license details.
  */
 
-namespace Getnet\SplitExampleMagento\Plugin\Getnet\PaymentMagento\Gateway\Request;
+namespace Getnet\SplitExampleMagento\Gateway\Request\Card;
 
+use InvalidArgumentException;
+use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
+use Magento\Payment\Gateway\Request\BuilderInterface;
 use Getnet\PaymentMagento\Gateway\Config\Config;
 use Getnet\PaymentMagento\Gateway\Config\ConfigCc;
 use Getnet\PaymentMagento\Gateway\Data\Order\OrderAdapterFactory;
-use Getnet\PaymentMagento\Gateway\Request\SplitPaymentDataRequest;
+use Getnet\PaymentMagento\Gateway\Request\Card\CardInitSchemaDataRequest;
 use Getnet\PaymentMagento\Gateway\SubjectReader;
 use Getnet\SplitExampleMagento\Helper\Data as SplitHelper;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Serialize\Serializer\Json;
 
 /**
- * Class Fetch Sub Seller Id To Split Payment - add Sub Seller in Transaction.
+ * Class Split Payment Data Request - Payment amount structure.
  */
-class FetchSubSellerIdToSplitPayment
+class SplitPaymentDataRequest implements BuilderInterface
 {
+    public const BLOCK_NAME_ADDITIONAL_DATA = 'additional_data';
+    public const BLOCK_NAME_SPLIT = 'split';
+    public const BLOCK_NAME_SUBSELLER_LIST_PAYMENT = 'subseller_list_payment';
+    public const BLOCK_NAME_SUB_SELLER_ID = 'subseller_id';
+    public const BLOCK_NAME_SUBSELLER_SALES_AMOUNT = 'subseller_sales_amount';
+    public const BLOCK_NAME_ORDER_ITEMS = 'order_items';
+    public const BLOCK_NAME_AMOUNT = 'amount';
+    public const BLOCK_NAME_CURRENCY = 'currency';
+    public const BLOCK_NAME_ID = 'id';
+    public const BLOCK_NAME_DESCRIPTION = 'description';
+    public const GUARANTOR_DOCUMENT_TYPE = 'document_type';
+    public const GUARANTOR_DOCUMENT_NUMBER = 'document_number';
+
     /**
      * @var SubjectReader
      */
@@ -38,7 +54,7 @@ class FetchSubSellerIdToSplitPayment
     protected $config;
 
     /**
-     * @var configCc
+     * @var ConfigCc
      */
     protected $configCc;
 
@@ -84,24 +100,17 @@ class FetchSubSellerIdToSplitPayment
     }
 
     /**
-     * Around method Build.
+     * Build.
      *
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     *
-     * @param SplitPaymentDataRequest $subject
-     * @param \Closure                $proceed
-     * @param array                   $buildSubject
-     *
-     * @return mixin
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @param array $buildSubject
      */
-    public function aroundBuild(
-        SplitPaymentDataRequest $subject,
-        \Closure $proceed,
-        $buildSubject
-    ) {
-        $result = $proceed($buildSubject);
-
+    public function build(array $buildSubject)
+    {
+        if (!isset($buildSubject['payment'])
+        || !$buildSubject['payment'] instanceof PaymentDataObjectInterface
+        ) {
+            throw new InvalidArgumentException('Payment data object should be provided');
+        }
         $paymentDO = $this->subjectReader->readPayment($buildSubject);
 
         $payment = $paymentDO->getPayment();
@@ -109,8 +118,6 @@ class FetchSubSellerIdToSplitPayment
         $result = [];
 
         $marketplace = [];
-
-        $installment = 0;
 
         /** @var OrderAdapterFactory $orderAdapter * */
         $orderAdapter = $this->orderAdapterFactory->create(
@@ -125,19 +132,24 @@ class FetchSubSellerIdToSplitPayment
 
         $payment = $paymentDO->getPayment();
 
-        $installment = $payment->getAdditionalInformation('cc_installments') ?: 1;
+        $payment = $paymentDO->getPayment();
 
-        if ($payment->getMethod() === 'getnet_paymentmagento_boleto'
-            || $payment->getMethod() === 'getnet_paymentmagento_pix'
-            || $payment->getMethod() === 'getnet_paymentmagento_getpay'
-        ) {
-            $installment = 0;
-        }
+        $installment = $payment->getAdditionalInformation('cc_installments') ?: 1;
 
         $storeId = $order->getStoreId();
 
         if (!isset($dataSellers['productBySeller'])) {
             return $result;
+        }
+
+        $typeDocument = 'CPF';
+
+        $document = $this->splitHelper->getAdditionalGuarantorNumber($storeId);
+
+        $document = preg_replace('/[^0-9]/', '', $document);
+
+        if (strlen($document) === 14) {
+            $typeDocument = 'CNPJ';
         }
 
         foreach ($dataSellers['productBySeller'] as $sellerId => $products) {
@@ -168,16 +180,21 @@ class FetchSubSellerIdToSplitPayment
                 }
             }
 
-            $result[SplitPaymentDataRequest::BLOCK_NAME_MARKETPLACE_SUBSELLER_PAYMENTS][] = [
-                SplitPaymentDataRequest::BLOCK_NAME_SUB_SELLER_ID          => $sellerId,
-                SplitPaymentDataRequest::BLOCK_NAME_SUBSELLER_SALES_AMOUNT => $this->config->formatPrice($commissionAmount),
-                SplitPaymentDataRequest::BLOCK_NAME_ORDER_ITEMS            => $products['product'],
-            ];
-        }
+            $result[CardInitSchemaDataRequest::DATA]
+                [self::BLOCK_NAME_ADDITIONAL_DATA]
+                [self::BLOCK_NAME_SPLIT][self::BLOCK_NAME_SUBSELLER_LIST_PAYMENT][] = [
+                    self::BLOCK_NAME_SUB_SELLER_ID          => $sellerId,
+                    self::GUARANTOR_DOCUMENT_TYPE           => $typeDocument,
+                    self::GUARANTOR_DOCUMENT_NUMBER         => $document,
+                    self::BLOCK_NAME_SUBSELLER_SALES_AMOUNT => $this->config->formatPrice($commissionAmount),
+                    self::BLOCK_NAME_ORDER_ITEMS            => $products['product'],
+                ];
+            }
 
-        foreach ($result[SplitPaymentDataRequest::BLOCK_NAME_MARKETPLACE_SUBSELLER_PAYMENTS] as $sellers) {
-            $seller = $sellers[SplitPaymentDataRequest::BLOCK_NAME_SUB_SELLER_ID];
-            $marketplace[$seller] = $sellers[SplitPaymentDataRequest::BLOCK_NAME_ORDER_ITEMS];
+        foreach ($result[CardInitSchemaDataRequest::DATA][self::BLOCK_NAME_ADDITIONAL_DATA][self::BLOCK_NAME_SPLIT][self::BLOCK_NAME_SUBSELLER_LIST_PAYMENT] as $sellers)
+        {
+            $seller = $sellers[self::BLOCK_NAME_SUB_SELLER_ID];
+            $marketplace[$seller] = $sellers[self::BLOCK_NAME_ORDER_ITEMS];
         }
 
         $payment->setAdditionalInformation(
@@ -225,16 +242,13 @@ class FetchSubSellerIdToSplitPayment
             $commissionPerProduct = $price * $commissionPercentage;
 
             $data['productBySeller'][$sellerId]['product'][] = [
-                SplitPaymentDataRequest::BLOCK_NAME_AMOUNT      => $this->config->formatPrice($price),
-                SplitPaymentDataRequest::BLOCK_NAME_CURRENCY    => $order->getCurrencyCode(),
-                SplitPaymentDataRequest::BLOCK_NAME_ID          => $item->getSku(),
-                SplitPaymentDataRequest::BLOCK_NAME_DESCRIPTION => __(
+                self::BLOCK_NAME_AMOUNT      => $this->config->formatPrice($price),
+                self::BLOCK_NAME_CURRENCY    => $order->getCurrencyCode(),
+                self::BLOCK_NAME_ID          => $item->getSku(),
+                self::BLOCK_NAME_DESCRIPTION => __(
                     'Product Name: %1 | Qty: %2',
                     $item->getName(),
                     $item->getQtyOrdered()
-                ),
-                SplitPaymentDataRequest::BLOCK_NAME_TAX_AMOUNT => $this->config->formatPrice(
-                    $price - $commissionPerProduct
                 ),
             ];
 
@@ -280,11 +294,10 @@ class FetchSubSellerIdToSplitPayment
         $rule = $dataSellers['subSellerSettings'][$sellerId]['commission'];
 
         $shippingProduct['products'][$sellerId] = [
-            SplitPaymentDataRequest::BLOCK_NAME_AMOUNT      => $this->config->formatPrice($priceShippingBySeller),
-            SplitPaymentDataRequest::BLOCK_NAME_CURRENCY    => $order->getCurrencyCode(),
-            SplitPaymentDataRequest::BLOCK_NAME_ID          => __('shipping-order-%1', $order->getOrderIncrementId()),
-            SplitPaymentDataRequest::BLOCK_NAME_DESCRIPTION => __('Shipping for %1 products', $qtyOrderedBySeller),
-            SplitPaymentDataRequest::BLOCK_NAME_TAX_AMOUNT  => ($rule['include_freight']) ? 0 : $this->config->formatPrice($priceShippingBySeller),
+            self::BLOCK_NAME_AMOUNT      => $this->config->formatPrice($priceShippingBySeller),
+            self::BLOCK_NAME_CURRENCY    => $order->getCurrencyCode(),
+            self::BLOCK_NAME_ID          => __('shipping-order-%1', $order->getOrderIncrementId()),
+            self::BLOCK_NAME_DESCRIPTION => __('Shipping for %1 products', $qtyOrderedBySeller),
         ];
 
         $shippingProduct['amount'][$sellerId] = $priceShippingBySeller;
@@ -323,7 +336,6 @@ class FetchSubSellerIdToSplitPayment
                 $installment,
                 $commissionAmount
             ),
-            SplitPaymentDataRequest::BLOCK_NAME_TAX_AMOUNT => ($rule['include_interest']) ? 0 : $this->config->formatPrice($amountInterest),
         ];
 
         $amountInterestProduct['amount'][$sellerId] = $amountInterest;
