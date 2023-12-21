@@ -103,6 +103,8 @@ class SplitPaymentDataRequest implements BuilderInterface
      * Build.
      *
      * @param array $buildSubject
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function build(array $buildSubject)
     {
@@ -191,8 +193,8 @@ class SplitPaymentDataRequest implements BuilderInterface
                 ];
             }
 
-        foreach ($result[CardInitSchemaDataRequest::DATA][self::BLOCK_NAME_ADDITIONAL_DATA][self::BLOCK_NAME_SPLIT][self::BLOCK_NAME_SUBSELLER_LIST_PAYMENT] as $sellers)
-        {
+        // phpcs:ignore Generic.Files.LineLength
+        foreach ($result[CardInitSchemaDataRequest::DATA][self::BLOCK_NAME_ADDITIONAL_DATA][self::BLOCK_NAME_SPLIT][self::BLOCK_NAME_SUBSELLER_LIST_PAYMENT] as $sellers) {
             $seller = $sellers[self::BLOCK_NAME_SUB_SELLER_ID];
             $marketplace[$seller] = $sellers[self::BLOCK_NAME_ORDER_ITEMS];
         }
@@ -239,7 +241,6 @@ class SplitPaymentDataRequest implements BuilderInterface
 
             $rulesToSplit = $this->splitHelper->getSplitCommissionsBySubSellerId($sellerId, $storeId);
             $commissionPercentage = $rulesToSplit['commission_percentage'] / 100;
-            $commissionPerProduct = $price * $commissionPercentage;
 
             $data['productBySeller'][$sellerId]['product'][] = [
                 self::BLOCK_NAME_AMOUNT      => $this->config->formatPrice($price),
@@ -291,8 +292,6 @@ class SplitPaymentDataRequest implements BuilderInterface
 
         $priceShippingBySeller = ($shippingAmount / $dataSellers['qtyOrderedInOrder']) * $qtyOrderedBySeller;
 
-        $rule = $dataSellers['subSellerSettings'][$sellerId]['commission'];
-
         $shippingProduct['products'][$sellerId] = [
             self::BLOCK_NAME_AMOUNT      => $this->config->formatPrice($priceShippingBySeller),
             self::BLOCK_NAME_CURRENCY    => $order->getCurrencyCode(),
@@ -323,8 +322,6 @@ class SplitPaymentDataRequest implements BuilderInterface
         float $commissionAmount,
         int $storeId = null
     ): array {
-        $rule = $dataSellers['subSellerSettings'][$sellerId]['commission'];
-
         $amountInterest = $this->configCc->getInterestToAmount($installment, $commissionAmount, $storeId);
 
         $amountInterestProduct['products'][$sellerId] = [
