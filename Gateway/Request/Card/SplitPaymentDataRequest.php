@@ -22,6 +22,8 @@ use Magento\Framework\Serialize\Serializer\Json;
 
 /**
  * Class Split Payment Data Request - Payment amount structure.
+ *
+ * @SuppressWarnings(PHPMD)
  */
 class SplitPaymentDataRequest implements BuilderInterface
 {
@@ -169,7 +171,6 @@ class SplitPaymentDataRequest implements BuilderInterface
             if ($installment > 1) {
                 $interestData = $this->addSplitInterestInSellerData(
                     $sellerId,
-                    $dataSellers,
                     $installment,
                     $commissionAmount,
                     $storeId
@@ -240,7 +241,6 @@ class SplitPaymentDataRequest implements BuilderInterface
             $price = $item->getPrice() * $item->getQtyOrdered();
 
             $rulesToSplit = $this->splitHelper->getSplitCommissionsBySubSellerId($sellerId, $storeId);
-            $commissionPercentage = $rulesToSplit['commission_percentage'] / 100;
 
             $data['productBySeller'][$sellerId]['product'][] = [
                 self::BLOCK_NAME_AMOUNT      => $this->config->formatPrice($price),
@@ -308,7 +308,6 @@ class SplitPaymentDataRequest implements BuilderInterface
      * Add Split Interest In Seller Data.
      *
      * @param string   $sellerId
-     * @param array    $dataSellers
      * @param int      $installment
      * @param float    $commissionAmount
      * @param int|null $storeId
@@ -317,7 +316,6 @@ class SplitPaymentDataRequest implements BuilderInterface
      */
     public function addSplitInterestInSellerData(
         string $sellerId,
-        array $dataSellers,
         int $installment,
         float $commissionAmount,
         int $storeId = null

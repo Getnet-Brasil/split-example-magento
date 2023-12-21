@@ -209,7 +209,6 @@ class SplitPaymentDataRequest implements BuilderInterface
             $price = $item->getPrice() * $item->getQtyOrdered();
 
             $rulesToSplit = $this->splitHelper->getSplitCommissionsBySubSellerId($sellerId, $storeId);
-            $commissionPercentage = $rulesToSplit['commission_percentage'] / 100;
 
             $data['productBySeller'][$sellerId]['product'][] = [
                 self::BLOCK_NAME_AMOUNT      => $this->config->formatPrice($price),
